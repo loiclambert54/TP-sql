@@ -1,0 +1,53 @@
+Partie 2 - Requêtes SQL et Vues
+
+1. Quels serveurs (nom, date) ont servi la table 14 en septembre 2009.
+
+SELECT serv.prenom, serv.nom, com.date_enregistrement
+FROM commandes com, serveurs serv
+WHERE com.id_serveur = serv.id_serveur 
+AND TABLE_NO = 14 
+AND TO_CHAR(TO_DATE(date_enregistrement,'DD-MM-RR'),'MON-RR') = 'SEP-09’ ;
+
+2. Quels serveurs (nom) ont servi le plat “sorbet mirabelle”.
+
+SELECT D.prenom, D.nom
+FROM commandes com, detail_commande detcom, menus me, serveurs serv
+WHERE com.id_commande = detcom.id_commande 
+AND com.id_serveur = serv.id_serveur 
+AND detcom.id_menu = me.id_menu 
+AND detcom.id_menu = 21 ;
+
+3. Chiffre d’affaires réalisé par chaque serveur (nom) en septembre 2009.
+
+SELECT serv.prenom, serv.nom, SUM(detcom.quantite * me.prix_plat) AS Revenus
+FROM commandes com, detail_commande detcom, menu me, serveurs serv
+WHERE com.id_commande = detcom.id_commande 
+AND com.id_serveur = serv.id_serveur 
+AND detcom.id_menu = me.id_menu 
+AND TO_CHAR (TO_DATE (date_enregistrement,'DD-MM-RR'),'MON-RR') = 'SEP-09'
+GROUP BY serv.prenom, serv.nom ;
+
+5. Quel plat d’entrée a été le plus souvent commandé (n° et nom du plat).
+
+SELECT detcom.ITEM_ID, me.ITEM_NAME
+FROM detail_commande detcom, menu me
+WHERE detcom.id_menu = me.id_menu
+AND me.type_plat = 5
+GROUP BY detcom.id_menu, me.nom_plat 
+ORDER BY SUM (detcom.quantite) DESC ;
+
+6. Quels plats n’ont jamais été commandés (n° et nom du plat).
+
+SELECT me.id_menu, me.nom_menu 
+FROM menu me, detail_commande detcom
+WHERE me.id_menu = detcom.id_menu
+AND detcom.id_menu IS NULL 
+ORDER BY me.id_menu ;
+
+8. Liste des commandes comportant un “sorbet mirabelle” et un “pate lorrain”.
+
+SELECT com.id_commande, detcom.id_menu, me.nom_plat
+FROM commandes com, detail_commande detcom, menu me
+WHERE com.id_commande = detcom.id_commande 
+AND detcom.id_menu = me.id_menu 
+AND detcom.id_menu IN (1, 21) ;
