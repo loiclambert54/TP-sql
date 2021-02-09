@@ -1,0 +1,51 @@
+Partie 1 - Conception et Création de la base
+
+On souhaite traiter la gestion des commandes d’un restaurant en utilisant une base de données.
+
+- Le restaurant dispose de plusieurs tables, chacune identifiée par un numéro et caractérisée par le nombre de convives qu’elle peut recevoir.
+- Plusieurs serveurs travaillent dans le restaurant. Un serveur est identifié par un numéro, est caractérisé par son nom, son prénom et son grade. Un serveur est affecté par journée entière à une ou plusieurs tables. Une table, un jour donné, est toujours servie par un seul serveur.
+- Les commandes, identifiées par un numéro (n° de séquence) correspondent toujours à une seule table. Une commande est décrite par la date d’enregistrement, la date/heure d’encaissement, le mode de paiement, le montant total, le nombre de personnes.
+- Chaque commande porte sur un ou plusieurs plats. Les plats sont identifiés par un code et sont décrits par un libellé, un type (entrée, viande, dessert.....) et un prix unitaire.
+Dans une commande, chaque ligne correspond à un plat commandé en une certaine quantité.
+
+Travail à réaliser
+
+1- Construire le modèle EA
+2- Définir les CI : clés primaires, clés étrangères, contraintes d’unicité, contraintes check.
+3- Chargez un jeu de données cohérent dans les différentes tables
+
+Partie 2 - Requêtes SQL et Vues
+
+1. Quels serveurs (nom, date)  ont servi la table 14 en septembre 2009.
+2. Quels serveurs (nom) ont servi le plat “sorbet mirabelle”
+3. Chiffre d’affaires réalisé par chaque serveur (nom) en septembre 2009
+4. Calculer le chiffre d’affaires moyen par personne 
+5. Quel plat d’entrée a été le plus souvent commandé (n° et nom du plat)
+6. Quels plats n’ont jamais été commandés (n° et nom du plat)
+7. Quel(s) plat(s) figure(nt) dans toutes les commandes du 10/09/2009 (n° et nom du plat)
+8. Liste des commandes comportant un “sorbet mirabelle” et un “pate lorrain”
+
+ 
+9. définir la vue qui permet d’écrire (sans jointure) les requêtes suivantes:
+		a) nom du serveur qui a servi la table 4, le 10/09/2009
+		b) nom des serveurs qui ont servi les tables de 5 ou 6 places, le 10/09/2009
+		c) Chiffre d’affaires par serveur le 10/09/2009
+10. créer une vue pour l’ajout et la mise à jour de la table “affecter”; la vue doit permettre de vérifier année=2009, numserv existe dans table “serveur”, numtable existe dans la table “tabl”.
+Puis vous écrivez une requête pour insérer un nouvel élément dans la table “affecter” en utilisant la vue ci-dessus.
+
+Partie 3 - PL/SQL et TRIGGERS
+
+1 - Écrire le programme PL/SQL qui affiche le chiffre d’affaires par serveur, pour un jour donné (à saisir), ainsi que les commandes correspondantes.
+
+2 - Écrire la procédure stockée qui calcule le montant total d’une commande et met à jour la table ‘commande’ (paramètre entrée: n° de commande).
+Puis appeler la procédure stockée dans un programme pl/sql.
+
+3- Ecrire la fonction  stockée qui retourne le Chiffre d’affaires fait par un serveur un jour donné.
+(Paramètres d’entrée: n° serveur et date du jour).
+Puis écrire le programme pl/sql qui utilise cette fonction pour afficher le CA fait par les différents serveurs un jour donné.
+
+4 - Écrire le trigger qui enregistre dans un fichier ‘audit’ toutes les commandes dont le montant par personne est > 14€. La table ‘audit’ aura la description suivante: n° de commande, n° de table, date de commande, nombre de personnes, montant de la commande.
+
+5 - Écrire le trigger qui incrémente/décrémente le nombre de commandes traitées par chaque serveur (il faut ajouter un champ ‘compteur dans la table serveur)
+
+6- Écrire le trigger qui vérifie que la quantité d’un plat commandé ne dépasse pas le nombre de personnes concernées par la commande. Afficher un message d’erreur.
