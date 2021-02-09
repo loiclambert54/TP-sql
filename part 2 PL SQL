@@ -1,0 +1,77 @@
+Part 3 - PL/SQL et TRIGGERS
+
+1 - Écrire le programme PL/SQL qui affiche le chiffre d’affaires par serveur, pour un jour donné (à saisir), ainsi que les commandes correspondantes.
+
+DECLARE
+Date_enregistrement D, commandes.date_enregistrement%TYPE;
+SELECT id_serveur, prenom, nom,
+ROUND((AVG(COUNT_I / (SELECT COUNT(id-serveur) FROM commandes WHERE TO_DATE(date_enregistrement,'DD-MM-RR') = TO_DATE(date_ enregistrement D,'DD-MM-RR') )) * 100),2) || '%' AS chiffre d’affaire FROM
+(SELECT id_serveur S , prenom P , nom N , COUNT(S.id_serveur) AS COUNT_I FROM commadnes S, serveurs P
+WHERE S.id_serveur = P.id_serveur
+AND TO_DATE(date_enregistrement,'DD-MM-RR') = TO_DATE(date_enregistrement D ,'DD-MM-RR')
+GROUP BY S.id_serveur, P. prenom, N.nom ORDER BY S.id_serveur)
+GROUP BY id_serveur, prenom ,nom;
+
+
+2 - Écrire la procédure stockée qui calcule le montant total d’une commande et met à jour la table ‘commande’ (paramètre entrée: n° de commande).
+Puis appeler la procédure stockée dans un programme pl/sql.
+
+CREATE OR REPLACE PROCEDURE montant total (id_commande IN commandes.id_commande%TYPE) AS
+Montant total menus.prix_plat  %TYPE;
+BEGIN
+SELECT SUM(B.quantité * C.prix_plat) INTO montant total m
+FROM commande A, detail commande B, menus C
+WHERE A.id_commande = B.id_commande AND
+B.id_menu = C.id_menu
+AND A.id_commande = montant total m
+GROUP BY A.id_commande;
+
+UPDATE commandes SET
+Prix_total = montant total m 
+WHERE id_commande = id_commande m;
+COMMIT;
+EXCEPTION WHEN NO_DATA_FOUND THEN NULL;
+END;
+
+3- Ecrire la fonction  stockée qui retourne le Chiffre d’affaires fait par un serveur un jour donné.
+(Paramètres d’entrée: n° serveur et date du jour).
+Puis écrire le programme pl/sql qui utilise cette fonction pour afficher le CA fait par les différents serveurs un jour donné.
+
+CREATE OR REPLACE FUNCTION chiffre d’affaire (
+Id_serveur S IN commandes.id_serveur%TYPE,
+Date_enregistrement D IN commandes.date_enregistrement%TYPE)
+RETURN VARCHAR2 IS chiffre d’affaire VARCHAR(20);
+BEGIN
+SELECT ROUND((AVG(COUNT_I / (SELECT COUNT(id_serveur) FROM commandes WHERE TO_DATE(date_enregistrement,'DD-MM-RR') = TO_DATE(date_enregistrement D ,'DD-MM-RR') )) * 100),2) || '%' INTO chiffre d’affaire 
+FROM (SELECTid_serveur , COUNT(id_serveur) AS COUNT_I FROM commandes
+WHERE TO_DATE(date_enregistrement,'DD-MM-RR') = TO_DATE(date_enregistrement D 'DD-MM-RR')
+GROUP BY id_serveur
+WHERE id_serveur =id_serveur S;
+RETURN chiffre d’affaire ;
+END GET_chiffre d’affaire CA;
+
+
+4 - Écrire le trigger qui enregistre dans un fichier ‘audit’ toutes les commandes dont le montant par personne est > 14€. La table ‘audit’ aura la description suivante: n° de commande, n° de table, date de commande, nombre de personnes, montant de la commande.
+
+//
+
+5 - Écrire le trigger qui incrémente/décrémente le nombre de commandes traitées par chaque serveur (il faut ajouter un champ ‘compteur dans la table serveur)
+
+CREATE OR REPLACE TRIGGER commandes traitees BEFORE INSERT ON commandes 
+FOR EACH ROW
+BEGIN
+UPDATE serveurs SET commandes traitees = commandes traitees + 1 WHERE id_serveur= :NEW.id_serveur;
+END;
+
+
+6- Écrire le trigger qui vérifie que la quantité d’un plat commandé ne dépasse pas le nombre de personnes concernées par la commande. Afficher un message d’erreur.
+
+CREATE OR REPLACE TRIGGER detail commande BEFORE INSERT OR UPDATE OF quantite ON details commande FOR EACH ROW
+DECLARE
+Nb_personnes NUMBER(10);
+BEGIN
+  SELECT nb_personnes INTO nb_personnes N FROM commandes WHERE id_commande= :NEW.id_commande;
+  IF :NEW.quantité > nb_personnes N THEN
+  RAISE_APPLICATION_ERROR(' La Quantité dépasse le nombre de personnes concernées par la commande’);
+  END IF;
+END;
